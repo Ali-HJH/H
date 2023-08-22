@@ -1,0 +1,39 @@
+import numpy as np
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+
+# 假设附件2中的数据为两个NumPy数组：wavelengths和KS_values，分别表示波长和K/S值
+# 你需要将附件2中的数据填入这两个数组中
+
+def quadratic_fit(x, a0, a1, a2):
+    return a0 + a1 * x + a2 * x**2
+
+# 进行拟合
+params, covariance = curve_fit(quadratic_fit, wavelengths, KS_values)
+
+# 得到拟合的系数
+a0_fit, a1_fit, a2_fit = params
+
+# 计算拟合后的K/S值
+fit_KS_values = quadratic_fit(wavelengths, a0_fit, a1_fit, a2_fit)
+
+# 计算拟合优度（R方值）
+residuals = KS_values - fit_KS_values
+ss_res = np.sum(residuals**2)
+ss_tot = np.sum((KS_values - np.mean(KS_values))**2)
+r_squared = 1 - (ss_res / ss_tot)
+
+# 打印拟合的系数和拟合优度
+print("拟合系数:")
+print("a0 =", a0_fit)
+print("a1 =", a1_fit)
+print("a2 =", a2_fit)
+print("拟合优度 (R方值):", r_squared)
+
+# 可视化拟合结果
+plt.scatter(wavelengths, KS_values, label="原始数据")
+plt.plot(wavelengths, fit_KS_values, color='red', label="拟合曲线")
+plt.xlabel("波长")
+plt.ylabel("K/S值")
+plt.legend()
+plt.show()
