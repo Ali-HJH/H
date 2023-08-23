@@ -1,1 +1,60 @@
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import matplotlib.pyplot as plt
 
+# 数据准备
+concentrations = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+K_over_S = np.array([0.039492, 0.025906, 0.018503, 0.013699, 0.010508, 0.008195, 0.006429, 0.005045, 0.003951, 0.003079])
+
+# 将数据转换为PyTorch的Tensor
+concentrations_tensor = torch.tensor(concentrations, dtype=torch.float32).view(-1, 1)
+K_over_S_tensor = torch.tensor(K_over_S, dtype=torch.float32).view(-1, 1)
+
+# 定义一个简单的神经网络模型
+class NeuralNet(nn.Module):
+    def __init__(self):
+        super(NeuralNet, self).__init__()
+        self.fc1 = nn.Linear(1, 10)  # 输入层到隐藏层
+        self.fc2 = nn.Linear(10, 1)  # 隐藏层到输出层
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))  # 使用ReLU激活函数
+        x = self.fc2(x)
+        return x
+
+# 创建模型实例、损失函数和优化器
+model = NeuralNet()
+criterion = nn.MSELoss()  # 均方误差作为损失函数
+optimizer = optim.Adam(model.parameters(), lr=0.01)  # Adam优化器
+
+# 训练神经网络模型
+num_epochs = 1000
+for epoch in range(num_epochs):
+    model.train()  # 进入训练模式
+    optimizer.zero_grad()  # 清除梯度
+
+    # 前向传播
+    outputs = model(concentrations_tensor)
+    loss = criterion(outputs, K_over_S_tensor)
+
+    # 反向传播及优化
+    loss.backward()
+    optimizer.step()
+
+    if (epoch + 1) % 100 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+# 使用训练好的模型进行预测并绘图
+model.eval()  # 进入评估模式
+with torch.no_grad():
+    predicted_K_over_S = model(concentrations_tensor)
+
+plt.scatter(concentrations, K_over_S, label='Actual Data')
+plt.plot(concentrations, predicted_K_over_S.numpy(), label='Predicted Data', color='red')
+plt.xlabel('Concentration')
+plt.ylabel('K/S Value')
+plt.title('Nonlinear Fit using Neural Network')
+plt.legend()
+plt.show()
