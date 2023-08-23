@@ -1,1 +1,22 @@
-
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+ 
+# 假设附件2中的数据为data2，包含红、黄、蓝三种着色剂的K/S值和波长数据
+data2 = pd.read_csv("attachment2.csv")
+ 
+# 假设附件3中的数据为data3，包含10个目标样的R值
+data3 = pd.read_csv("attachment3.csv")
+ 
+# 假设附件4中的数据为data4，包含红、黄、蓝三种色母粒单位克重的价格
+data4 = pd.read_csv("attachment4.csv")
+ 
+# 定义计算颜色参数和色差的函数（与问题2相似）
+ 
+# 定义计算成本的函数
+def compute_cost(ingredients):
+    # 假设每种色母粒的单位重量是price_D1、price_D2和price_D3
+    price_D1 = data4["红色色母粒单位克重价格"][0]
+    price_D2 = data4["黄色色母粒单位克重价格"][0]
+    price_D3 = data4["蓝色色母粒单位克重价格"][0]
+ 
